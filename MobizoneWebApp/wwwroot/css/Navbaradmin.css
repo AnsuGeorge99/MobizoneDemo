@@ -1,0 +1,29 @@
+﻿header {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+    border-bottom: 1px solid;
+ 
+}
+
+    header h2 a {
+        display: flex;
+        align-items: center;
+    }
+
+        header h2 a img {
+            width: 100px;
+        }
+
+    header nav ul {
+        display: flex;
+    }
+
+        header nav ul li a {
+            padding: 10px;
+            background:transparent;
+        }
+/*nav ul {
+    background: transparent;
+}*/

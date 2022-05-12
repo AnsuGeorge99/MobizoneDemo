@@ -1,0 +1,125 @@
+﻿
+/*
+body {
+    margin: 0;
+    font-family: "Lato", sans-serif;
+}
+
+.sidebar {
+    margin: 0;
+    padding: 0;
+    width: 200px;
+    background-color: transparent;
+    position: fixed;
+    height: 100%;
+    overflow: auto;
+    left: 0;
+}
+
+    .sidebar a {
+        display: block;
+        color: black;
+        padding: 16px;
+        text-decoration: none;
+        font-size: larger;
+        font-family: 'Oswald', sans-serif;
+        font-variant: all-petite-caps;
+        font-size: 26px;
+    }
+
+        .sidebar a.active {
+            background-color: #aba09f00;
+            color: #eb4545;
+        }
+
+
+        .sidebar a:hover:not(.active) {
+            background-color: transparent;
+            color: gray;
+        }
+
+div.content {
+    margin-left: 200px;
+    padding: 1px 16px;
+    height: 100%;
+}
+
+@media screen and (max-width: 700px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+        .sidebar a {
+            float: left;
+        }
+
+    div.content {
+        margin-left: 0;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .sidebar a {
+        text-align: center;
+        float: none;
+    }
+}*/
+/*aside {
+    flex: 1 1 20%;
+    padding: 10px;
+}
+
+    aside > ul > li {
+        padding: 15px;
+        border-bottom: 1px solid;
+    }
+
+        aside > ul > li.brandcontainer {
+            display: none;
+        }
+
+            aside > ul > li.brandcontainer.active {
+                display: block;
+            }
+
+        aside > ul > li .filterbrand {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+            aside > ul > li .filterbrand li {
+                flex: 0 0 49%;
+                padding: 5px;
+                border: thin solid;
+                margin-bottom: 5px;
+            }
+
+    aside > ul > li {
+        padding: 15px;
+        border-bottom: 1px solid;
+    }
+
+        aside > ul > li.sortcontainer {
+            display: none;
+        }
+
+            aside > ul > li.sortcontainer.active {
+                display: block;
+            }
+
+        aside > ul > li .sort {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+            aside > ul > li .sort li {
+                flex: 0 0 49%;
+                padding: 5px;
+                border: thin solid;
+                margin-bottom: 5px;
+            }*/
+
