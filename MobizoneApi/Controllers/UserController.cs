@@ -35,7 +35,7 @@ namespace APILayer.Controllers
             try 
             {
                 var result = await _userOperations.Register(register);
-                if (result.Succeeded)
+                if (result)
                 {
                     return Ok(new UserResponse<string> { status = "Success", message = "User registration is successfully completed"}) ;
                 }
@@ -60,14 +60,15 @@ namespace APILayer.Controllers
                 Login loginData = new Login();
                 loginData.username = login.username;
                 loginData.password = login.password;
-                var result = await _userOperations.Userlogin(loginData);
-                if (string.IsNullOrEmpty(result))
+                var result = await _userOperations.Authenticate(loginData.username, loginData.password);
+                if (result != null && result.roleId==1)
                 {
-                    return StatusCode(StatusCodes.Status401Unauthorized, new UserResponse<string> { status = "Error", message = "Login failed, please try again. If not registered, please Register to order your product" });
+                    return Ok(new UserResponse<string> { status = "Success", message = "Login Successfull" });
+                    
                 }
                 else
                 {
-                    return Ok(new UserResponse<string> { status = "Success", message = "Login Successfull" ,token = result });
+                    return StatusCode(StatusCodes.Status401Unauthorized, new UserResponse<string> { status = "Error", message = "Login failed, please try again. If not registered, please Register to order your product" });
                 }
             }
             catch (Exception ex) 
@@ -95,6 +96,32 @@ namespace APILayer.Controllers
             {
                 _logger.LogError("Error to reset password", ex);
                 return StatusCode(StatusCodes.Status400BadRequest);
+            }
+        }
+        [HttpPost("AdminLogin")]
+        public async Task<IActionResult> AdminLogin([FromBody] Login login)
+        {
+            try
+            {
+                Login loginData = new Login();
+                loginData.username = login.username;
+                loginData.password = login.password;
+                var result = await _userOperations.Authenticate(loginData.username, loginData.password);
+                if (result != null && result.roleId == 2)
+                {
+                    return Ok(new UserResponse<string> { status = "Success", message = "Login Successfull" });
+
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status401Unauthorized, new UserResponse<string> { status = "Error", message = "Login failed, please try again. If not registered, please Register to order your product" });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation("error");
+                _logger.LogError("error");
+                return StatusCode(StatusCodes.Status400BadRequest, ex);
             }
         }
     }

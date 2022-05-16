@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using UILayer.Datas.Apiservices;
 using Microsoft.AspNetCore.Authorization;
 using DomainLayer;
+using UILayer.ApiServices;
 
 namespace UILayer.Controllers
 {
@@ -44,16 +45,32 @@ namespace UILayer.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login(string loginUrl)
+        public IActionResult Login(string ReturnUrl)
         {
-            ViewData["LoginUrl"] = loginUrl;
+            ViewData["LoginUrl"] = ReturnUrl;
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(Login loginView)
+        public async Task<IActionResult> Login(Login loginView , string ReturnUrl)
         //public async Task<IActionResult> Login(Login loginView)
         {
+            AdminApi admin = new AdminApi();
+            if (ReturnUrl == "/admin")
+            {
+                if (admin.AdminLogin(loginView))
+                {
+                    var claims = new List<Claim>();
+
+                    claims.Add(new Claim("password", loginView.password));
+                    claims.Add(new Claim(ClaimTypes.NameIdentifier, loginView.username));
+                    claims.Add(new Claim(ClaimTypes.Name, loginView.username));
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+                    await HttpContext.SignInAsync(claimsPrincipal);
+                    return Redirect("/admin/Index");
+                }
+            }
             Login userLogin = new Login();
             //Login userLogin = new Login();
             _registration = _userApi.GetUserInfo().Where(register => register.email == loginView.username).FirstOrDefault();
@@ -69,7 +86,7 @@ namespace UILayer.Controllers
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
                 await HttpContext.SignInAsync(claimsPrincipal);
-                return RedirectToAction("Index");
+                return RedirectToAction("/user/Index");
             }
             TempData["Error"] = "*Invalid Email or Password";
             return View("Login");

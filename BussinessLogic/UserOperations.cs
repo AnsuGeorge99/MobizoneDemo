@@ -21,35 +21,46 @@ namespace BusinesLogic
         private readonly ProductDbContext _dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
-        public UserOperations(ProductDbContext dbContext, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
+        public UserOperations(ProductDbContext dbContext, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, RoleManager<IdentityRole> roleManager)
         {
             _dbContext = dbContext;
             _repositoryOperation = new GenericRepositoryOperation<Registration>(_dbContext);
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
+            _roleManager = roleManager;
         }
-        public async Task<IdentityResult> Register(Registration register)
+        public async Task<bool> Register(Registration register)
         //public async Task<bool> Register(Registration register)
         {
-            var user = new ApplicationUser()
+            /*try
             {
-                firstName = register.firstName,
-                lastName = register.lastName,
-                Email = register.email,
-                UserName = register.email
-            }; 
-            return await _userManager.CreateAsync(user, register.password);
-            //try
-            //{
-            //    _repositoryOperation.Add(register);
-            //    return true;
-            //}
-            //catch (Exception ex)
-            //{
-            //    return false;
-            //}
+                var user = new ApplicationUser()
+                {
+                    firstName = register.firstName,
+                    lastName = register.lastName,
+                    Email = register.email,
+                    UserName = register.email
+                };
+                var result = _userManager.CreateAsync(user, register.password);
+                return await _userManager.AddToRoleAsync(user, UserRoles.User);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }*/
+            try
+            {
+                register.roleId = 1;
+                _repositoryOperation.Add(register);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         public async Task<Registration> Authenticate(string username, string password)
@@ -69,26 +80,28 @@ namespace BusinesLogic
 
         public async Task<string> Userlogin(Login login)
         {
-            var result = await _signInManager.PasswordSignInAsync(login.username, login.password, false, false);
-            if (!result.Succeeded)
+            var user = await _userManager.FindByNameAsync(login.username);
+            if (user != null && await _userManager.CheckPasswordAsync(user, login.password))
             {
-                return null;
-            }
-            var authclaims = new List<Claim>
+                var userRoles = await _userManager.GetRolesAsync(user);
+
+                var authClaims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, login.username),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
-            var authSignInKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JWT:Secret"]));
-            var token = new JwtSecurityToken
-            (
-            issuer: _configuration["JWT:ValidIssuer"],
-            audience: _configuration["JWT:ValidAudience"],
-            expires: DateTime.Now.AddHours(3),
-            claims: authclaims,
-            signingCredentials: new SigningCredentials(authSignInKey, SecurityAlgorithms.HmacSha256Signature)
-            );
-            return new JwtSecurityTokenHandler().WriteToken(token);
+
+                foreach (var userRole in userRoles)
+                {
+                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                }
+
+                var token = GetToken(authClaims);
+
+                return token.ToString();
+            }
+            return null;
+           
         }
 
         public async Task<List<ApplicationUser>> GetUser()
@@ -96,6 +109,21 @@ namespace BusinesLogic
             //return _repositoryOperation.GetAll();
             var users = _userManager.Users.ToList();
             return users;
+        }
+
+        private JwtSecurityToken GetToken(List<Claim> authClaims)
+        {
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["JWT:ValidIssuer"],
+                audience: _configuration["JWT:ValidAudience"],
+                expires: DateTime.Now.AddHours(3),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+                );
+
+            return token;
         }
     }
 }

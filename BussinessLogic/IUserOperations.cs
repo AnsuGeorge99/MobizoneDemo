@@ -10,7 +10,7 @@ namespace BusinesLogic.Interface
 {
     public interface IUserOperations
     {
-        Task<IdentityResult> Register(Registration register);
+        Task<bool> Register(Registration register);
         //Task<bool> Register(Registration register);
         Task<Registration> Authenticate(string username, string password);
         Task Edit(Registration user);

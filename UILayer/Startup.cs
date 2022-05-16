@@ -27,7 +27,7 @@ namespace UILayer
             services.AddControllersWithViews();
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
             {
-                options.LoginPath = "/login";
+                options.LoginPath = "/user/login";
                 options.Events = new CookieAuthenticationEvents()
                 {
                     OnSigningIn = async context => { await Task.CompletedTask; },
@@ -54,14 +54,14 @@ namespace UILayer
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=user}/{action=Index}/{id?}");
             });
         }
     }
